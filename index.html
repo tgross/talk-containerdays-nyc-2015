@@ -83,6 +83,7 @@
     <li class="fragment">Or run on-premise (it's open source!)</li>
   </ul>
   <aside class="notes" data-markdown><script type="text/template">
+       - product manager for Joyent
       - running LX-brand zones (Linux containers as Solaris zones) for almost 10 years
       - Triton is a Docker API lets you treat our whole datacenter as a single docker host
       - (or yours)
@@ -208,6 +209,11 @@
   <section>
     <h2>NAT</h2>
     <img data-src="img/docker-nat.png"/>
+    <aside class="notes" data-markdown><script type="text/template">
+        - this is the default `--bridge` networking
+        - there's also a virtualization layer here thru docker daemon
+        - bridge on host, veth interfaces attached to bridge and container
+    </script></aside>
   </section>
   <section>
     <h2>NAT</h2>
@@ -223,41 +229,43 @@
     <p><code>--host</code> networking</p>
     <ul>
       <li>breaks multi-tenant security</li>
-      <li>Port mapping at LB</li>
-      <li>Port namespacing</li>
+      <li>port conflicts</li>
+      <li>port mapping at LB</li>
     </ul>
   </div>
-  <aside class="notes">
-    - working around with `--host` makes utilization even worse
-    - Can't have multiple container per host on the same port.
-  </aside>
+  <aside class="notes" data-markdown><script type="text/template">
+      - Docker recommendation for network I/O-intensive apps
+      - working around with `--host` makes utilization even worse
+      - Can't have multiple container per host on the same port.
+  </script></aside>
 </section>
 
 <section>
   <h2>Can we avoid NAT?</h2>
   <img style="width:50%;float:left;" data-src="img/docker-bridge-networking.png"/>
   <div>
-    <p><code>--bridge</code> networking</p>
+    <p>Bridge (not <code>--bridge</code>) networking</p>
     <ul>
-      <li>IP per container</li>
+      <li>Can get IP per container</li>
       <li>May need 2nd NIC</li>
       <li>Scaling w/ subnet per host</li>
     </ul>
   </div>
-  <aside class="notes">
-    - may need second NIC w/ some cloud providers
-    - subnet per host ex. Kubernetes
-    - sim. to socketplane
-  </aside>
+  <aside class="notes" data-markdown><script type="text/template">
+      - sim. to socketplane
+      - may need second NIC w/ some cloud providers
+      - subnet per host ex. Kubernetes
+      - closest to OpenSolaris Crossbow (i.e. Triton) you can get w/ Linux alone, but we do it all in-kernel
+  </script></aside>
 </section>
 
 <section>
 <h2>Single Point of Failure</h2>
 <a href="http://www.pcmag.com/article2/0,2817,2413572,00.asp"><img data-src="img/pcmag-xmas-outage.png"></a>
 <aside class="notes" data-markdown><script type="text/template">
-    - managed LB can fail when app won't
-    - this happened to Netflix and DF
-      - ELB is built on EBS
+    - LB can fail when app won't
+    - even managed LBs: this happened to Netflix and DF
+      - this event was "human error", but ELB is built on EBS
       - so even if your AWS EC2 instances aren't you can be hit
   </script></aside>
 </section>
@@ -321,12 +329,17 @@
     <img data-src="img/docker-heart-chef.png"/>
     <aside class="notes" data-markdown><script type="text/template">
         - like onions and ogres, we have layers (of orchestration)
-        - docker+chef (ref ChefConf talk)
+        - docker+chef (ref ChefConf talk), isn't this great?
     </script></aside>
   </section>
   <section>
     <p>Infrastructure is undifferentiated heavy lifting!</p>
     <img data-src="img/docker-heart-chef-broken.png"/>
+    <aside class="notes">No! this sucks!</aside>
+  </section>
+  <section>
+    <img data-src="img/ami-factory.png"/>
+    <aside class="notes">look at all this stuff!</aside>
   </section>
 </section>
 
@@ -445,7 +458,7 @@
       - ex. no adding mysqlclient to Consul
       - health check can be different mechanism than external API
       - doesn't have to be HTTP response from blocked server
-      - can even do stuff like HTTP long polling
+      - can even do stuff like HTTP long polling / pubsub
   </script></aside>
 </section>
 
@@ -584,7 +597,8 @@ ADD etc/nginx/conf.d /etc/nginx/conf.d/
 </section>
 
 <section data-background="./img/grid-black.png">
-  <pre><code data-trim>
+  <section data-background="./img/grid-black.png">
+    <pre><code data-trim>
 $ less ./nginx/default.ctmpl
 
 # for each service, create a backend
@@ -596,16 +610,14 @@ upstream {{.Name}} {
     {{end}}
 }
 {{end}}
-  </code></pre>
-  <aside class="notes" data-markdown><script type="text/template">
-      - write an Nginx upstream stanza for each service from consul
-      - "server ip:port"
-  </script></aside>
-
+    </code></pre>
+    <aside class="notes" data-markdown><script type="text/template">
+        - write an Nginx upstream stanza for each service from consul
+        - "server ip:port"
+    </script></aside>
   </section>
-
-<section data-background="./img/grid-black.png">
-  <pre><code data-trim>
+  <section data-background="./img/grid-black.png">
+    <pre><code data-trim>
 server {
     listen 80;
     server_name _;
@@ -624,7 +636,8 @@ server {
     }
     {{end}}
 }
-  </code></pre>
+    </code></pre>
+  </section>
 </section>
 
 <section data-background="./img/grid-black.png">
