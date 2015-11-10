@@ -52,9 +52,9 @@
   <p class="fragment">Each container is an equal peer on the network.</p>
   <aside class="notes" data-markdown><script type="text/template">
       I will argue:
-      - containers are an opinionated deployment
-      - not about fat vs thin, schedulers, etc.
-      - containers must not be ghettoized in the host's network.
+      - containers are an opinionated deployment of isolation (c.f. unikernels, VMs)
+      - not about fat vs thin, multi-process vs single process, which of umpteen schedulers, etc.
+      containers must not be ghettoized in the host's network.
   </script></aside>
 </section>
 
@@ -65,8 +65,8 @@
   <p class="fragment">Application containers make the full promise of cloud computing possible...</p>
   <p class="fragment">but require new ways of working.</p>
   <aside class="notes" data-markdown><script type="text/template">
-      - value proposition of containers?
-      - if they are first class-citizens
+      - value proposition of containers: elasticity, utilization, isolation
+      - only if they are first class-citizens
   </script></aside>
 </section>
 
@@ -84,7 +84,7 @@
     <li class="fragment">Or run on-premise (it's open source!)</li>
   </ul>
   <aside class="notes" data-markdown><script type="text/template">
-      - product manager for Joyent
+      - me: product manager for Joyent
       - running LX-brand zones (Linux containers as Solaris zones) for almost 10 years
       - Triton is a Docker API lets you treat our whole datacenter as a single docker host
       - (or yours)
@@ -510,6 +510,7 @@ curl --fail -s -X PUT -d @myservice.json \
 
 <section>
   <h2>Containerbuddy to the rescue!</h2>
+  <a href="https://github.com/joyent/containerbuddy">https://github.com/joyent/containerbuddy</a>
 </section>
 
 <section>
